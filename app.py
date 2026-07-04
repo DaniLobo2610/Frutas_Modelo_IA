@@ -191,9 +191,19 @@ FRUTAS = {
 
     "Apple": "🍎 Apple - Manzana",
 
-    "Avocado": "🥑 Avocado - Aguacate",
-
     "Banana": "🍌 Banana - Banano",
+
+    "Pear": "🍐 Pear - Pera",
+
+    "Tomato": "🍅 Tomato - Tomate",
+
+    "Cactus Fruit": "🌵 Cactus Fruit - Fruta del Cactus",
+
+    "Orange": "🍊 Orange - Naranja",
+
+    "Strawberry": "🍓 Strawberry - Fresa",
+
+    "Avocado": "🥑 Avocado - Aguacate",
 
     "Blackberry": "🫐 Blackberry - Mora",
 
@@ -201,23 +211,15 @@ FRUTAS = {
 
     "Cherry": "🍒 Cherry - Cereza",
 
-    "Cactus Fruit": "🌵 Cactus Fruit - Fruta del Cactus",
-
     "Grape": "🍇 Grape - Uva",
-
-    "Orange": "🍊 Orange - Naranja",
 
     "Papaya": "🥭 Papaya - Papaya",
 
     "Peach": "🍑 Peach - Durazno",
 
-    "Pear": "🍐 Pear - Pera",
+    "Raspberry": "🫐 Raspberry - Frambuesa"
 
-    "Raspberry": "🫐 Raspberry - Frambuesa",
-
-    "Strawberry": "🍓 Strawberry - Fresa",
-
-    "Tomato": "🍅 Tomato - Tomate"
+    
 
 }
 
