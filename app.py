@@ -334,13 +334,9 @@ if archivo is not None:
     with izquierda:
 
         st.image(
-
             imagen,
-
             caption="Imagen cargada",
-
             use_container_width=True
-
         )
 
     resultados = predecir(imagen)
@@ -356,30 +352,25 @@ if archivo is not None:
         st.progress(confianza / 100)
 
         st.markdown(
-
             f"### Confianza: **{confianza:.2f}%**"
-
         )
 
+    # ==================================================
+    # TOP 3 PREDICCIONES
+    # ==================================================
 
+    st.divider()
 
-# ==================================================
-# TOP 3 PREDICCIONES
-# ==================================================
+    st.subheader("🥇 Top 3 Predicciones")
 
-st.divider()
+    for fruta, confianza in resultados:
 
-st.subheader("🥇 Top 3 Predicciones")
+        st.markdown(f"### {fruta}")
 
-for fruta, confianza in resultados:
+        st.progress(min(confianza / 100, 1.0))
 
-    st.markdown(f"### {fruta}")
+        st.markdown(f"**{confianza:.2f}%**")
 
-    st.progress(min(confianza / 100, 1.0))
-
-    st.markdown(f"**{confianza:.2f}%**")
-
-    st.write("")
-
+        st.write("")
 
 
