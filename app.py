@@ -184,42 +184,43 @@ clases = cargar_clases()
 
 
 # ==================================================
-# EMOJIS
+# Frutas Disponibles
 # ==================================================
 
-EMOJIS = {
+FRUTAS = {
 
-    "Apple":"🍎",
+    "Apple": "🍎 Apple - Manzana",
 
-    "Avocado":"🥑",
+    "Avocado": "🥑 Avocado - Aguacate",
 
-    "Banana":"🍌",
+    "Banana": "🍌 Banana - Banano",
 
-    "Blackberry":"🫐",
+    "Blackberry": "🫐 Blackberry - Mora",
 
-    "Carambola":"⭐",
+    "Carambola": "⭐ Carambola - Carambola",
 
-    "Cherry":"🍒",
+    "Cherry": "🍒 Cherry - Cereza",
 
-    "Coconut":"🥥",
+    "Coconut": "🥥 Coconut - Coco",
 
-    "Grape":"🍇",
+    "Grape": "🍇 Grape - Uva",
 
-    "Orange":"🍊",
+    "Orange": "🍊 Orange - Naranja",
 
-    "Papaya":"🥭",
+    "Papaya": "🥭 Papaya - Papaya",
 
-    "Peach":"🍑",
+    "Peach": "🍑 Peach - Durazno",
 
-    "Pear":"🍐",
+    "Pear": "🍐 Pear - Pera",
 
-    "Raspberry":"🫐",
+    "Raspberry": "🫐 Raspberry - Frambuesa",
 
-    "Strawberry":"🍓",
+    "Strawberry": "🍓 Strawberry - Fresa",
 
-    "Tomato":"🍅"
+    "Tomato": "🍅 Tomato - Tomate"
 
 }
+
 
 # ==================================================
 # FRUTAS DISPONIBLES
@@ -255,4 +256,23 @@ for i,(nombre,emoji) in enumerate(lista):
 
     else:
         col5.write(f"{emoji} {nombre}")
+
+# ==================================================
+# PREPARAR IMAGEN
+# ==================================================
+
+def preparar_imagen(imagen):
+
+    imagen = imagen.convert("RGB")
+
+    imagen = imagen.resize(IMG_SIZE)
+
+    img = np.array(imagen, dtype=np.float32)
+
+    img = tf.keras.applications.mobilenet_v2.preprocess_input(img)
+
+    img = np.expand_dims(img, axis=0)
+
+    return img
+
 
