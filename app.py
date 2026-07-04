@@ -184,42 +184,43 @@ clases = cargar_clases()
 
 
 # ==================================================
-# EMOJIS
+# Frutas Disponibles
 # ==================================================
 
-EMOJIS = {
+FRUTAS = {
 
-    "Apple":"🍎",
+    "Apple": "🍎 Apple - Manzana",
 
-    "Avocado":"🥑",
+    "Avocado": "🥑 Avocado - Aguacate",
 
-    "Banana":"🍌",
+    "Banana": "🍌 Banana - Banano",
 
-    "Blackberry":"🫐",
+    "Blackberry": "🫐 Blackberry - Mora",
 
-    "Carambola":"⭐",
+    "Carambola": "⭐ Carambola - Carambola",
 
-    "Cherry":"🍒",
+    "Cherry": "🍒 Cherry - Cereza",
 
-    "Coconut":"🥥",
+    "Cactus Fruit": "🌵 Cactus Fruit - Fruta del Cactus",
 
-    "Grape":"🍇",
+    "Grape": "🍇 Grape - Uva",
 
-    "Orange":"🍊",
+    "Orange": "🍊 Orange - Naranja",
 
-    "Papaya":"🥭",
+    "Papaya": "🥭 Papaya - Papaya",
 
-    "Peach":"🍑",
+    "Peach": "🍑 Peach - Durazno",
 
-    "Pear":"🍐",
+    "Pear": "🍐 Pear - Pera",
 
-    "Raspberry":"🫐",
+    "Raspberry": "🫐 Raspberry - Frambuesa",
 
-    "Strawberry":"🍓",
+    "Strawberry": "🍓 Strawberry - Fresa",
 
-    "Tomato":"🍅"
+    "Tomato": "🍅 Tomato - Tomate"
 
 }
+
 
 # ==================================================
 # FRUTAS DISPONIBLES
@@ -237,22 +238,137 @@ st.markdown("""
 
 col1,col2,col3,col4,col5 = st.columns(5)
 
-lista = list(EMOJIS.items())
+lista = list(FRUTAS.items())
 
-for i,(nombre,emoji) in enumerate(lista):
+for i, (nombre, descripcion) in enumerate(lista):
 
-    if i%5==0:
-        col1.write(f"{emoji} {nombre}")
+    if i % 5 == 0:
+        col1.write(descripcion)
 
-    elif i%5==1:
-        col2.write(f"{emoji} {nombre}")
+    elif i % 5 == 1:
+        col2.write(descripcion)
 
-    elif i%5==2:
-        col3.write(f"{emoji} {nombre}")
+    elif i % 5 == 2:
+        col3.write(descripcion)
 
-    elif i%5==3:
-        col4.write(f"{emoji} {nombre}")
+    elif i % 5 == 3:
+        col4.write(descripcion)
 
     else:
-        col5.write(f"{emoji} {nombre}")
+        col5.write(descripcion)
 
+# ==================================================
+# PREPARAR IMAGEN
+# ==================================================
+
+def preparar_imagen(imagen):
+
+    imagen = imagen.convert("RGB")
+
+    imagen = imagen.resize(IMG_SIZE)
+
+    img = np.array(imagen, dtype=np.float32)
+
+    img = tf.keras.applications.mobilenet_v2.preprocess_input(img)
+
+    img = np.expand_dims(img, axis=0)
+
+    return img
+
+
+# ==================================================
+# PREDICCIÓN
+# ==================================================
+
+def predecir(imagen):
+
+    img = preparar_imagen(imagen)
+
+    predicciones = modelo.predict(img, verbose=0)[0]
+
+    top3 = np.argsort(predicciones)[::-1][:3]
+
+    resultados = []
+
+    for indice in top3:
+
+        clase = clases[indice]
+
+        confianza = float(predicciones[indice]) * 100
+
+        descripcion = FRUTAS.get(clase, clase)
+
+        resultados.append((descripcion, confianza))
+
+    return resultados
+
+
+# ==================================================
+# SUBIR IMAGEN
+# ==================================================
+
+st.divider()
+
+st.subheader("📤 Cargar Imagen")
+
+archivo = st.file_uploader(
+
+    "Seleccione una imagen de una fruta",
+
+    type=["jpg","jpeg","png"]
+
+)
+
+
+
+# ==================================================
+# RESULTADO
+# ==================================================
+
+if archivo is not None:
+
+    imagen = Image.open(archivo)
+
+    izquierda, derecha = st.columns([1,1])
+
+    with izquierda:
+
+        st.image(
+            imagen,
+            caption="Imagen cargada",
+            use_container_width=True
+        )
+
+    resultados = predecir(imagen)
+
+    fruta, confianza = resultados[0]
+
+    with derecha:
+
+        st.markdown("## 🏆 Resultado")
+
+        st.success(fruta)
+
+        st.progress(confianza / 100)
+
+        st.markdown(
+            f"### Confianza: **{confianza:.2f}%**"
+        )
+
+    # ==================================================
+    # TOP 3 PREDICCIONES
+    # ==================================================
+
+    st.divider()
+
+    st.subheader("🥇 Top 3 Predicciones")
+
+    for fruta, confianza in resultados:
+
+        st.markdown(f"### {fruta}")
+
+        st.progress(min(confianza / 100, 1.0))
+
+        st.markdown(f"**{confianza:.2f}%**")
+
+        st.write("")
