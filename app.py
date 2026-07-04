@@ -187,7 +187,7 @@ clases = cargar_clases()
 # Frutas Disponibles
 # ==================================================
 
-FRUTAS = {
+EMOJIS = {
 
     "Apple": "🍎 Apple - Manzana",
 
