@@ -19,7 +19,7 @@ print("Importaciones cargadas correctamente.")
 
 IMG_SIZE = (224, 224)
 BATCH_SIZE = 32
-EPOCHS = 10
+EPOCHS = 9
 LEARNING_RATE = 0.0001
 SEED = 42
 
@@ -44,12 +44,14 @@ print(f"Modelo: {MODEL_DIR}")
 train_datagen = ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
     rotation_range=20,
-    zoom_range=0.20,
+    zoom_range=0.30,
     width_shift_range=0.15,
     height_shift_range=0.15,
     shear_range=0.15,
     horizontal_flip=True,
-    fill_mode="nearest"
+    fill_mode="nearest",
+    brightness_range=(0.7, 1.3),
+    channel_shift_range=20,
 )
 
 test_datagen = ImageDataGenerator(

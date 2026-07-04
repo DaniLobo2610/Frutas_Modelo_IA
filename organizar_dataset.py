@@ -1,31 +1,29 @@
 import random
+import re
 import shutil
 from pathlib import Path
 
 random.seed(42)
 
-# ============================
+# ==========================================
 # CONFIGURACIÓN
-# ============================
+# ==========================================
 
-MAX_IMAGENES = 2000
+MAX_ORIGINALES = 2000
+MAX_MULTI = 300
 
 ORIGEN = Path("dataset_original")
+MULTI = Path("fruits-360_multi/test-multiple_fruits")
 DESTINO = Path("dataset")
-
-# ============================
-# FRUTAS A UTILIZAR
-# ============================
 
 FRUTAS = {
     "Apple": ["apple"],
     "Avocado": ["avocado"],
     "Banana": ["banana"],
     "Blackberry": ["blackberry"],
+    "Cactus Fruit": ["cactus fruit"],
     "Carambola": ["carambola"],
     "Cherry": ["cherry"],
-    "Cactus Fruit": [
-    "cactus fruit"],
     "Grape": ["grape"],
     "Orange": ["orange"],
     "Papaya": ["papaya"],
@@ -36,15 +34,20 @@ FRUTAS = {
     "Tomato": ["tomato"]
 }
 
-# ============================
-# RECORRER TRAINING - VALIDATION - TEST
-# ============================
+def imagen_valida(nombre_archivo, palabra):
 
-for division in ["Training", "Validation", "Test"]:
+    nombre = nombre_archivo.lower()
 
-    print(f"\n==============================")
+    patron = rf"^{re.escape(palabra.replace(' ', '_'))}_[0-9]+$"
+
+    return re.match(patron, nombre) is not None
+
+
+for division in ["Training","Validation","Test"]:
+
+    print(f"\n{'='*50}")
     print(f"Procesando {division}")
-    print(f"==============================")
+    print(f"{'='*50}")
 
     carpeta_origen = ORIGEN / division
     carpeta_destino = DESTINO / division
@@ -53,14 +56,13 @@ for division in ["Training", "Validation", "Test"]:
 
     resumen = {}
 
-    for fruta in FRUTAS.keys():
+    for fruta, palabras in FRUTAS.items():
 
-        nueva_carpeta = carpeta_destino / fruta
-        nueva_carpeta.mkdir(exist_ok=True)
+        destino_fruta = carpeta_destino / fruta
+        destino_fruta.mkdir(exist_ok=True)
 
         imagenes = []
 
-        # Buscar todas las carpetas que pertenecen a esa fruta
         for carpeta in carpeta_origen.iterdir():
 
             if not carpeta.is_dir():
@@ -68,46 +70,77 @@ for division in ["Training", "Validation", "Test"]:
 
             nombre = carpeta.name.lower()
 
-            if any(palabra in nombre for palabra in FRUTAS[fruta]):
+            if any(p in nombre for p in palabras):
 
-                for imagen in carpeta.iterdir():
+                for img in carpeta.iterdir():
 
-                    if imagen.is_file():
+                    if img.is_file():
 
-                        imagenes.append((carpeta.name, imagen))
+                        imagenes.append((carpeta.name,img))
 
-        # Mezclar las imágenes
         random.shuffle(imagenes)
 
-        # Limitar a MAX_IMAGENES
-        if len(imagenes) > MAX_IMAGENES:
+        imagenes = imagenes[:MAX_ORIGINALES]
 
-            imagenes = imagenes[:MAX_IMAGENES]
-
-        # Copiar imágenes
         contador = 0
 
-        for nombre_carpeta, imagen in imagenes:
+        for carpeta_nombre,img in imagenes:
 
-            nuevo_nombre = f"{nombre_carpeta.replace(' ','_')}_{imagen.name}"
+            nuevo = f"{carpeta_nombre.replace(' ','_')}_{img.name}"
 
             shutil.copy2(
 
-                imagen,
+                img,
 
-                nueva_carpeta / nuevo_nombre
+                destino_fruta / nuevo
 
             )
 
             contador += 1
 
-        resumen[fruta] = contador
+        if division == "Training":
 
-    print("\nResumen:")
+            multi = []
 
-    for fruta, cantidad in resumen.items():
+            for img in MULTI.iterdir():
 
-        print(f"{fruta:<15} -> {cantidad:>5} imágenes")
+                if not img.is_file():
+                    continue
+
+                for palabra in palabras:
+
+                    if imagen_valida(img.stem,palabra):
+
+                        multi.append(img)
+
+                        break
+
+            random.shuffle(multi)
+
+            multi = multi[:MAX_MULTI]
+
+            for i,img in enumerate(multi):
+
+                nuevo = f"multi_{i+1}{img.suffix}"
+
+                shutil.copy2(
+
+                    img,
+
+                    destino_fruta / nuevo
+
+                )
+
+                contador += 1
+
+        resumen[fruta]=contador
+
+
+    print("\nResumen:\n")
+
+    for fruta,cantidad in resumen.items():
+
+        print(f"{fruta:<18} -> {cantidad} imágenes")
 
 print("\n===================================")
 print("Dataset organizado correctamente")
